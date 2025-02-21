@@ -2,8 +2,6 @@ package orchestrator
 
 import (
 	"errors"
-	"os"
-	"strconv"
 	"sync"
 
 	"github.com/ZolotarevAlexandr/yl_sprint_2_final/calculator/calculator"
@@ -22,19 +20,19 @@ type Expression struct {
 	Expr       string   `json:"expression"`
 	Status     string   `json:"status"` // "pending" or "done"
 	Result     *float64 `json:"result,omitempty"`
-	RootTaskID string   // identifier of the root task
+	RootTaskID string   `json:"-"`
 }
 
 // Task represents an individual task (binary operation).
 type Task struct {
-	ID            string   `json:"id"`
-	ExpressionID  string   // the expression this task belongs to
+	ID            string `json:"id"`
+	ExpressionID  string
 	Operator      string   `json:"operation"`
 	Arg1          *float64 `json:"arg1,omitempty"`
 	Arg2          *float64 `json:"arg2,omitempty"`
-	DepTask1      string   // if the first operand comes from another task
-	DepTask2      string   // if the second operand comes from another task
-	OperationTime int      `json:"operation_time"` // operation execution time in milliseconds
+	DepTask1      string
+	DepTask2      string
+	OperationTime int      `json:"operation_time"` // (in milliseconds)
 	Status        string   // "pending", "running", "done"
 	Result        *float64 `json:"result,omitempty"`
 }
@@ -46,33 +44,23 @@ type Node struct {
 	Operator  string  // if node represents an operation
 	Left      *Node
 	Right     *Node
-	TaskID    string // identifier of the corresponding task
+	TaskID    string
 }
 
 // getOperationTime returns the operation execution time using environment variables.
 func getOperationTime(op string) int {
-	var envVar string
 	switch op {
 	case "+":
-		envVar = "TIME_ADDITION_MS"
+		return AdditionTimeMs
 	case "-":
-		envVar = "TIME_SUBTRACTION_MS"
+		return SubtractionTimeMs
 	case "*":
-		envVar = "TIME_MULTIPLICATIONS_MS"
+		return MultiplicationTimeMs
 	case "/":
-		envVar = "TIME_DIVISIONS_MS"
+		return DivisionTimeMs
 	default:
 		return 1000
 	}
-	msStr := os.Getenv(envVar)
-	if msStr == "" {
-		return 1000
-	}
-	ms, err := strconv.Atoi(msStr)
-	if err != nil {
-		return 1000
-	}
-	return ms
 }
 
 // buildExpressionTree builds an expression tree from tokens in Reverse Polish Notation.
@@ -86,7 +74,6 @@ func buildExpressionTree(tokens []calculator.Token) (*Node, error) {
 			if len(stack) < 2 {
 				return nil, errors.New("not enough operands")
 			}
-			// Pop the right then the left operand
 			right := stack[len(stack)-1]
 			left := stack[len(stack)-2]
 			stack = stack[:len(stack)-2]

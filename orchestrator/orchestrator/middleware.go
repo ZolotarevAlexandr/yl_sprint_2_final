@@ -25,13 +25,9 @@ func LoggingMiddleware(next http.Handler) http.Handler {
 
 		log.Printf("Request: %s %s", r.Method, r.URL.Path)
 
-		// Wrap the ResponseWriter
 		rw := &ResponseWriterWrapper{ResponseWriter: w, statusCode: http.StatusOK}
-
-		// Call the next handler
 		next.ServeHTTP(rw, r)
 
-		// Log the status code and duration
 		log.Printf("Completed with status %d in %v", rw.statusCode, time.Since(start))
 	})
 }

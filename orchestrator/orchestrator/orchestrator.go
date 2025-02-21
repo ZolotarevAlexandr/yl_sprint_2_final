@@ -4,22 +4,18 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 )
 
 func RunOrchestrator() {
 	mux := http.NewServeMux()
 
-	mux.Handle("/api/v1/calculate", LoggingMiddleware(http.HandlerFunc(handleCalculate)))
-	mux.Handle("/api/v1/expressions", LoggingMiddleware(http.HandlerFunc(expressionsHandler)))
-	mux.Handle("/internal/task", LoggingMiddleware(http.HandlerFunc(internalTaskHandler)))
+	mux.Handle("/api/v1/calculate", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(handleCalculate))))
+	mux.Handle("/api/v1/expressions", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(handleListExpressions))))
+	mux.Handle("/api/v1/expressions/", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(handleGetExpression))))
+	mux.Handle("/internal/task", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(internalTaskHandler))))
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	fmt.Printf("Orchestrator is running on %s\n", port)
-	if err := http.ListenAndServe(":"+port, mux); err != nil {
+	fmt.Printf("Orchestrator is running on %s\n", Port)
+	if err := http.ListenAndServe(":"+Port, mux); err != nil {
 		log.Fatal(err)
 	}
 }

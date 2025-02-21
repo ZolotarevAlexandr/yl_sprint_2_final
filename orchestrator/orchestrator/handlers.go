@@ -24,15 +24,6 @@ func handleCalculate(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"id": expr.ID})
 }
 
-// expressionsHandler handles GET requests for fetching a list of expressions or a single expression by id.
-func expressionsHandler(w http.ResponseWriter, r *http.Request) {
-	if strings.HasPrefix(r.URL.Path, "/api/v1/expressions/") {
-		handleGetExpression(w, r)
-	} else {
-		handleListExpressions(w, r)
-	}
-}
-
 // internalTaskHandler handles agent requests: GET for retrieving a task and POST for submitting the result.
 func internalTaskHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {

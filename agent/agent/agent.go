@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
-	"strconv"
 	"time"
 
 	"github.com/ZolotarevAlexandr/yl_sprint_2_final/calculator/calculator"
@@ -15,13 +13,9 @@ import (
 
 // worker is a goroutine that continuously requests tasks.
 func worker(workerID int) {
-	orchestratorPort := os.Getenv("ORCHESTRATOR_PORT")
-	if orchestratorPort == "" {
-		orchestratorPort = "8080"
-	}
 	client := &http.Client{}
 	for {
-		resp, err := client.Get(fmt.Sprintf("http://localhost:%s/internal/task", orchestratorPort))
+		resp, err := client.Get(fmt.Sprintf("http://localhost:%s/internal/task", OrchestratorPort))
 		if err != nil {
 			time.Sleep(1 * time.Second)
 			continue
@@ -61,7 +55,7 @@ func worker(workerID int) {
 			"id":     task.ID,
 			"result": result,
 		})
-		_, err = client.Post(fmt.Sprintf("http://localhost:%s/internal/task", orchestratorPort), "application/json", bytes.NewBuffer(payload))
+		_, err = client.Post(fmt.Sprintf("http://localhost:%s/internal/task", OrchestratorPort), "application/json", bytes.NewBuffer(payload))
 		if err != nil {
 			log.Printf("Worker %d: error posting result for task %s: %v", workerID, task.ID, err)
 			continue
@@ -71,15 +65,10 @@ func worker(workerID int) {
 }
 
 func RunAgent() {
-	cpStr := os.Getenv("COMPUTING_POWER")
-	cp, err := strconv.Atoi(cpStr)
-	if err != nil || cp < 1 {
-		cp = 1
-	}
-	for i := 0; i < cp; i++ {
+	for i := 0; i < ComputingPower; i++ {
 		go worker(i)
 	}
-	fmt.Printf("Started agent with %d workers\n", cp)
+	fmt.Printf("Started agent with %d workers\n", ComputingPower)
 	// Infinite wait
 	select {}
 }
