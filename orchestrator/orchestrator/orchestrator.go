@@ -9,6 +9,7 @@ import (
 func RunOrchestrator() {
 	mux := http.NewServeMux()
 
+	mux.Handle("/api/v1/ping", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(handlePing))))
 	mux.Handle("/api/v1/calculate", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(handleCalculate))))
 	mux.Handle("/api/v1/expressions", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(handleListExpressions))))
 	mux.Handle("/api/v1/expressions/", ErrorHandlingMiddleware(LoggingMiddleware(http.HandlerFunc(handleGetExpression))))

@@ -6,6 +6,12 @@ import (
 	"strings"
 )
 
+// handlePing handles GET /api/v1/ping healthcheck endpoint.
+// It should always return 200 with message "orchestrator is up and running"
+func handlePing(w http.ResponseWriter, r *http.Request) {
+	json.NewEncoder(w).Encode(map[string]string{"message": "orchestrator is up and running"})
+}
+
 // handleCalculate processes POST /api/v1/calculate to add a new expression.
 func handleCalculate(w http.ResponseWriter, r *http.Request) {
 	var req struct {
