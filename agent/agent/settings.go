@@ -8,7 +8,7 @@ import (
 // Settings holds all the configuration values
 var (
 	OrchestratorPort = getEnv("ORCHESTRATOR_PORT", "8080")
-	ComputingPower   = getEnvInt("COMPUTING_POWER", 1)
+	ComputingPower   = getEnvInt("COMPUTING_POWER", 2)
 )
 
 // getEnv retrieves a string environment variable or returns a default value.

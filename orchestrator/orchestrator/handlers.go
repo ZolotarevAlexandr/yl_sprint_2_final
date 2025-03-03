@@ -23,7 +23,7 @@ func handleCalculate(w http.ResponseWriter, r *http.Request) {
 	}
 	expr, err := BuildExpressionTasks(req.Expression)
 	if err != nil {
-		http.Error(w, "error processing expression", http.StatusInternalServerError)
+		http.Error(w, "error processing expression", http.StatusUnprocessableEntity)
 		return
 	}
 	w.WriteHeader(http.StatusCreated)
